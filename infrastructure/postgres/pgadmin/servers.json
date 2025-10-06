@@ -1,0 +1,14 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "PPT Generator DB",
+      "Group": "Servers",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "ppt_generator",
+      "Username": "ppt_admin",
+      "PassFile": "/var/lib/pgadmin/pgpass",
+      "SSLMode": "prefer"
+    }
+  }
+}

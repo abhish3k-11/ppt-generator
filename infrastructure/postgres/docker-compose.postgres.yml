@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: ppt-postgres
+    environment:
+      POSTGRES_DB: ppt_generator
+      POSTGRES_USER: ppt_admin
+      POSTGRES_PASSWORD: SecurePass123!
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d/
+    command: >
+      postgres 
+      -c shared_preload_libraries=pg_stat_statements
+      -c max_connections=200
+      -c shared_buffers=256MB
+      -c effective_cache_size=1GB
+      -c work_mem=4MB
+      -c log_statement=all
+      -c log_min_duration_statement=0
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ppt_admin -d ppt_generator"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - ppt-network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: ppt-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@pptgen.com
+      PGADMIN_DEFAULT_PASSWORD: AdminPass123!
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_LISTEN_PORT: 80
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - ppt-network
+
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  ppt-network:
+    driver: bridge
