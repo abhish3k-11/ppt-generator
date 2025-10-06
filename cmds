@@ -1,1 +1,2 @@
-./
+To start postgres docker: ./scripts/start-postgres.bat
+To stop postgres docker: docker compose -f .\infrastructure\postgres\docker-compose.postgres.yml down
